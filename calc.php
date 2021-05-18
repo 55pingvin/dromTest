@@ -1,24 +1,38 @@
 <?php
 
-function getSumCount()
+function getFileListByFileName(string $path, string $_base_path = null, string $filename = 'count'): int
 {
+    $_base_path .= basename($path) . '/';
 
-    $num = shell_exec('find -type f -name count  -exec cat {} \;');
+    $out = 0;
 
-    $num = explode(PHP_EOL, $num);
-    $result = 0;
+    foreach(glob($path . '/*') as $file) {
+        if (is_dir($file)) {
+            $out += getFileListByFileName($file, $_base_path, $filename);
+        } elseif (basename($file) === $filename) {
 
-    foreach ($num as $sumNum) {
-        $result += $sumNum;
+            $countFile = $path . '/' . basename($file);
+
+            $f = fopen($countFile, 'rb');
+            $out += (int)fgets($f);
+
+            fclose($f);
+
+        }
     }
 
-    echo(
-    sprintf(
-        '%s: %s %s',
-        'Сумма',
-        $result,
-        PHP_EOL
-    ));
+    return $out;
+}
+
+function getSumCount()
+{
+    $argDir = getopt("d::");
+
+    $dir = $argDir['d'] ?? '/tmp/counter'; // TODO: доработать для работы с другими операционными системами
+
+    $files = getFileListByFileName($dir);
+
+    echo('Result: ' . $files . PHP_EOL);
 
 }
 

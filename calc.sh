@@ -1,7 +1,13 @@
 #!/bin/bash
 
+DIR=$1
 
-ARRAY=$(find -type f -name count  -exec cat {} \;)
+if [ "$DIR" == "" ];then
+  DIR="/tmp/counter"
+  mkdir -p $DIR
+fi
+
+ARRAY=$(find $DIR -type f -name count  -exec cat {} \;)
 
 RESULT=0
 
@@ -10,5 +16,5 @@ do
  RESULT=$(($RESULT + $NUM))
 done
 
-echo $RESULT
+echo 'Result:' $RESULT
 
